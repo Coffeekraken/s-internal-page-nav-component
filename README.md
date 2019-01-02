@@ -29,6 +29,8 @@
 
 Provide a simple way to create a nice internal page navigation that automaticaly activate the good link depending on the displayed section.
 
+[![View demo](http://components.coffeekraken.io/assets/img/view-demo.png)](http://components.coffeekraken.io/app/s-internal-page-nav-component)
+
 ## Table of content
 
 1. **[Demo](http://components.coffeekraken.io/app/s-internal-page-nav-component)**
