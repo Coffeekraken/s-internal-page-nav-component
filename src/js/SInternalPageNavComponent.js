@@ -1,7 +1,7 @@
-import SWebComponent from 'coffeekraken-sugar/js/core/SWebComponent'
-import __scrollTop from 'coffeekraken-sugar/js/dom/scrollTop'
-import __offset from 'coffeekraken-sugar/js/dom/offset'
-import __throttle from 'coffeekraken-sugar/js/utils/functions/throttle'
+import SWebComponent from "coffeekraken-sugar/js/core/SWebComponent";
+import __scrollTop from "coffeekraken-sugar/js/dom/scrollTop";
+import __offset from "coffeekraken-sugar/js/dom/offset";
+import __throttle from "coffeekraken-sugar/js/utils/functions/throttle";
 
 /**
  * Provide a simple way to create a nice internal page navigation that automaticaly activate the good link depending on the displayed section.
@@ -29,9 +29,8 @@ export default class Component extends SWebComponent {
    * @definition    SWebComponent.defaultProps
    * @protected
    */
-  static get defaultProps () {
+  static get defaultProps() {
     return {
-
       /**
        * Specify the y "percentage" of the screen from which the items are considered as active
        * By default, it's the half of the screen, so 0.5
@@ -45,21 +44,28 @@ export default class Component extends SWebComponent {
        * @prop
        * @type    {Boolean}
        */
-      checkBottomBoundary: true
+      checkBottomBoundary: true,
 
-    }
+      /**
+       * Check or not the pathname of the link. If the pathname of the link does not correspond
+       * to the pathname of the current page, the link if excluded from the internal page navigation
+       * @prop
+       * @type    {Boolean}
+       */
+      checkPathname: true
+    };
   }
 
   /**
    * Css
    * @protected
    */
-  static defaultCss (componentName, componentNameDash) {
+  static defaultCss(componentName, componentNameDash) {
     return `
       ${componentNameDash} {
         display : block;
       }
-    `
+    `;
   }
 
   /**
@@ -67,29 +73,29 @@ export default class Component extends SWebComponent {
    * @definition    SWebComponent.componentMount
    * @protected
    */
-  componentMount () {
-    super.componentMount()
+  componentMount() {
+    super.componentMount();
 
     // internal variables
-    this._targets = this._getTargets()
-    this._onScrollFn = __throttle(this._onScroll.bind(this))
+    this._targets = this._getTargets();
+    this._onScrollFn = __throttle(this._onScroll.bind(this));
 
     // listen for scroll to check
     // the targets
-    document.addEventListener('scroll', this._onScrollFn)
+    document.addEventListener("scroll", this._onScrollFn);
 
     // observe for new links
-    this._newLinkObserver = new MutationObserver((mutationsList) => {
+    this._newLinkObserver = new MutationObserver(mutationsList => {
       // update the targets
-      this._targets = this._getTargets()
-    })
+      this._targets = this._getTargets();
+    });
     this._newLinkObserver.observe(this, {
       childList: true,
       subtree: true
-    })
+    });
 
     // first check
-    this._checkTargets()
+    this._checkTargets();
   }
 
   /**
@@ -97,70 +103,86 @@ export default class Component extends SWebComponent {
    * @definition    SWebComponent.componentUnmount
    * @protected
    */
-  componentUnmount () {
-    super.componentUnmount()
+  componentUnmount() {
+    super.componentUnmount();
 
     // remoce some event listeners
-    document.removeEventListener('scroll', this._onScrollFn)
+    document.removeEventListener("scroll", this._onScrollFn);
 
     // stop listeneing for new links
-    this._newLinkObserver.disconnect()
+    this._newLinkObserver.disconnect();
   }
 
   /**
    * On scroll
    * @param    {Event}    e    The scroll event
    */
-  _onScroll (e) {
+  _onScroll(e) {
     // check targets
-    this._checkTargets()
+    this._checkTargets();
   }
 
   /**
    * Get the targets
    * @return    {Array}    An array of objects with
    */
-  _getTargets () {
-    const navTargets = []
+  _getTargets() {
+    const navTargets = [];
     // loop on each links inside the internal page nav component
-    ;[].forEach.call(this.querySelectorAll('a[href^="#"]'), (linkElm) => {
+    [].forEach.call(this.querySelectorAll('a[href*="#"]'), linkElm => {
+      // process the href for links like my-link#my-hash
+      const href = linkElm.getAttribute("href");
+      const pathname = href.split("#")[0];
+      const hash = href.split("#")[1];
+      // check if the current link belongs to the current page by
+      // checking the pathname property
+      if (
+        this.props.checkPathname &&
+        pathname &&
+        pathname !== document.location.pathname &&
+        `/${pathname}` !== document.location.pathname
+      ) {
+        return;
+      }
       // get the destination element using the hash
-      const destElm = document.querySelector(linkElm.getAttribute('href'))
+      const destElm = document.querySelector(`#${hash}`);
       // if no destination element, we do not process the link
-      if (!destElm) return
+      if (!destElm) return;
       // add the target object inside the stack
       navTargets.push({
         linkElm: linkElm,
         destElm: destElm
-      })
-    })
+      });
+    });
     // return the targets
-    return navTargets
+    return navTargets;
   }
 
   /**
    * Check targets
    */
-  _checkTargets () {
+  _checkTargets() {
     // loop on each dest elements backward to start from bottom to top
-    let destElmFound = false
+    let destElmFound = false;
     for (let i = this._targets.length - 1; i >= 0; i--) {
-      const target = this._targets[i]
+      const target = this._targets[i];
 
       if (destElmFound) {
-        target.linkElm.classList.remove('active')
+        target.linkElm.classList.remove("active");
       } else {
-        const offset = __offset(target.destElm)
-        const destTop = offset.top - __scrollTop()
-        const destBottom = destTop + target.destElm.offsetHeight
+        const offset = __offset(target.destElm);
+        const destTop = offset.top - __scrollTop();
+        const destBottom = destTop + target.destElm.offsetHeight;
 
-        if (destTop <= window.innerHeight * this.props.activeYPercent
-          && (destBottom >= window.innerHeight * this.props.activeYPercent || ! this.props.checkBottomBoundary)
+        if (
+          destTop <= window.innerHeight * this.props.activeYPercent &&
+          (destBottom >= window.innerHeight * this.props.activeYPercent ||
+            !this.props.checkBottomBoundary)
         ) {
-          target.linkElm.classList.add('active')
-          destElmFound = true
+          target.linkElm.classList.add("active");
+          destElmFound = true;
         } else {
-          target.linkElm.classList.remove('active')
+          target.linkElm.classList.remove("active");
         }
       }
     }
