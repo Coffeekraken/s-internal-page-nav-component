@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8,19 +8,19 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _SWebComponent2 = require('coffeekraken-sugar/js/core/SWebComponent');
+var _SWebComponent2 = require("coffeekraken-sugar/js/core/SWebComponent");
 
 var _SWebComponent3 = _interopRequireDefault(_SWebComponent2);
 
-var _scrollTop = require('coffeekraken-sugar/js/dom/scrollTop');
+var _scrollTop = require("coffeekraken-sugar/js/dom/scrollTop");
 
 var _scrollTop2 = _interopRequireDefault(_scrollTop);
 
-var _offset = require('coffeekraken-sugar/js/dom/offset');
+var _offset = require("coffeekraken-sugar/js/dom/offset");
 
 var _offset2 = _interopRequireDefault(_offset);
 
-var _throttle = require('coffeekraken-sugar/js/utils/functions/throttle');
+var _throttle = require("coffeekraken-sugar/js/utils/functions/throttle");
 
 var _throttle2 = _interopRequireDefault(_throttle);
 
@@ -62,7 +62,7 @@ var Component = function (_SWebComponent) {
   }
 
   _createClass(Component, [{
-    key: 'componentMount',
+    key: "componentMount",
 
 
     /**
@@ -73,7 +73,7 @@ var Component = function (_SWebComponent) {
     value: function componentMount() {
       var _this2 = this;
 
-      _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), 'componentMount', this).call(this);
+      _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), "componentMount", this).call(this);
 
       // internal variables
       this._targets = this._getTargets();
@@ -81,7 +81,7 @@ var Component = function (_SWebComponent) {
 
       // listen for scroll to check
       // the targets
-      document.addEventListener('scroll', this._onScrollFn);
+      document.addEventListener("scroll", this._onScrollFn);
 
       // observe for new links
       this._newLinkObserver = new MutationObserver(function (mutationsList) {
@@ -104,12 +104,12 @@ var Component = function (_SWebComponent) {
      */
 
   }, {
-    key: 'componentUnmount',
+    key: "componentUnmount",
     value: function componentUnmount() {
-      _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), 'componentUnmount', this).call(this);
+      _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), "componentUnmount", this).call(this);
 
       // remoce some event listeners
-      document.removeEventListener('scroll', this._onScrollFn);
+      document.removeEventListener("scroll", this._onScrollFn);
 
       // stop listeneing for new links
       this._newLinkObserver.disconnect();
@@ -121,7 +121,7 @@ var Component = function (_SWebComponent) {
      */
 
   }, {
-    key: '_onScroll',
+    key: "_onScroll",
     value: function _onScroll(e) {
       // check targets
       this._checkTargets();
@@ -133,13 +133,24 @@ var Component = function (_SWebComponent) {
      */
 
   }, {
-    key: '_getTargets',
+    key: "_getTargets",
     value: function _getTargets() {
-      var navTargets = []
+      var _this3 = this;
+
+      var navTargets = [];
       // loop on each links inside the internal page nav component
-      ;[].forEach.call(this.querySelectorAll('a[href^="#"]'), function (linkElm) {
+      [].forEach.call(this.querySelectorAll('a[href*="#"]'), function (linkElm) {
+        // process the href for links like my-link#my-hash
+        var href = linkElm.getAttribute("href");
+        var pathname = href.split("#")[0];
+        var hash = href.split("#")[1];
+        // check if the current link belongs to the current page by
+        // checking the pathname property
+        if (_this3.props.checkPathname && pathname && pathname !== document.location.pathname && "/" + pathname !== document.location.pathname) {
+          return;
+        }
         // get the destination element using the hash
-        var destElm = document.querySelector(linkElm.getAttribute('href'));
+        var destElm = document.querySelector("#" + hash);
         // if no destination element, we do not process the link
         if (!destElm) return;
         // add the target object inside the stack
@@ -157,7 +168,7 @@ var Component = function (_SWebComponent) {
      */
 
   }, {
-    key: '_checkTargets',
+    key: "_checkTargets",
     value: function _checkTargets() {
       // loop on each dest elements backward to start from bottom to top
       var destElmFound = false;
@@ -165,23 +176,23 @@ var Component = function (_SWebComponent) {
         var target = this._targets[i];
 
         if (destElmFound) {
-          target.linkElm.classList.remove('active');
+          target.linkElm.classList.remove("active");
         } else {
           var offset = (0, _offset2.default)(target.destElm);
           var destTop = offset.top - (0, _scrollTop2.default)();
           var destBottom = destTop + target.destElm.offsetHeight;
 
           if (destTop <= window.innerHeight * this.props.activeYPercent && (destBottom >= window.innerHeight * this.props.activeYPercent || !this.props.checkBottomBoundary)) {
-            target.linkElm.classList.add('active');
+            target.linkElm.classList.add("active");
             destElmFound = true;
           } else {
-            target.linkElm.classList.remove('active');
+            target.linkElm.classList.remove("active");
           }
         }
       }
     }
   }], [{
-    key: 'defaultCss',
+    key: "defaultCss",
 
 
     /**
@@ -189,10 +200,10 @@ var Component = function (_SWebComponent) {
      * @protected
      */
     value: function defaultCss(componentName, componentNameDash) {
-      return '\n      ' + componentNameDash + ' {\n        display : block;\n      }\n    ';
+      return "\n      " + componentNameDash + " {\n        display : block;\n      }\n    ";
     }
   }, {
-    key: 'defaultProps',
+    key: "defaultProps",
 
     /**
      * Default props
@@ -201,7 +212,6 @@ var Component = function (_SWebComponent) {
      */
     get: function get() {
       return {
-
         /**
          * Specify the y "percentage" of the screen from which the items are considered as active
          * By default, it's the half of the screen, so 0.5
@@ -215,8 +225,15 @@ var Component = function (_SWebComponent) {
          * @prop
          * @type    {Boolean}
          */
-        checkBottomBoundary: true
+        checkBottomBoundary: true,
 
+        /**
+         * Check or not the pathname of the link. If the pathname of the link does not correspond
+         * to the pathname of the current page, the link if excluded from the internal page navigation
+         * @prop
+         * @type    {Boolean}
+         */
+        checkPathname: true
       };
     }
   }]);

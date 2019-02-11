@@ -1,6 +1,6 @@
 {
   "name": "coffeekraken-s-internal-page-nav-component",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Provide a simple way to create a nice internal page navigation that automaticaly activate the good link depending on the displayed section",
   "main": "dist/index.js",
   "homepage": "http://coffeekraken.io",
@@ -35,14 +35,13 @@
     "doc:css": "coffeekraken-docblock-to-markdown -f 'src/**/*.scss' -d doc --remove-path src/",
     "start": "coffeekraken-scripts-stack dist:js demo:server -i dist -i start -i demo",
     "test": "jest",
-    "lint": "npm run lint:js && npm run lint:css",
+    "lint": "npm run lint:js",
     "lint:js": "standard 'src/**/*.js'",
     "lint:css": "stylelint 'src/sass/**/*.scss'",
     "changelog": "git-changelog --version_name $npm_package_version  --app_name $npm_package_name --intro \"$npm_package_description\" --logo \".resources/coffeekraken-logo.jpg\""
   },
   "pre-commit": [
-    "test",
-    "lint"
+    "test"
   ],
   "keywords": [
     "webcomponent",

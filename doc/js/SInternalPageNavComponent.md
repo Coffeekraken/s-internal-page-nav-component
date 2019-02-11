@@ -47,3 +47,13 @@ Specify if need to check the bottom boundary or not
 Type : **{ [Boolean](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean) }**
 
 Default : **true**
+
+
+### checkPathname
+
+Check or not the pathname of the link. If the pathname of the link does not correspond
+to the pathname of the current page, the link if excluded from the internal page navigation
+
+Type : **{ [Boolean](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean) }**
+
+Default : **true**
